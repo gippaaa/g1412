@@ -1,0 +1,209 @@
+
+---
+
+Dokumentasi Program: Aplikasi Perhitungan Diskon (Dengan Login & Database)
+
+
+---
+
+1. Deskripsi Umum
+
+Aplikasi ini adalah kalkulator diskon berbasis web yang:
+
+Hanya bisa diakses oleh pengguna yang sudah login.
+
+Menerima input nama barang, harga, dan persentase diskon.
+
+Melakukan validasi frontend dan backend agar diskon tidak melebihi 100%.
+
+Menyimpan hasil ke database (transactions).
+
+Menampilkan hasil perhitungan dengan format rupiah.
+
+Memberi umpan balik interaktif menggunakan SweetAlert2.
+
+
+
+---
+
+2. Teknologi yang Digunakan
+
+PHP: Untuk proses backend dan interaksi database.
+
+MySQL: Menyimpan data transaksi.
+
+HTML5 + Bootstrap: Untuk tampilan antarmuka yang responsif.
+
+JavaScript + SweetAlert2: Validasi dan feedback user-friendly.
+
+FontAwesome: Ikon panah untuk tombol kembali.
+
+
+
+---
+
+3. Struktur & Penjelasan Kode
+
+a. Autentikasi (Session Check)
+
+session_start();
+include 'Database/koneksi.php';
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit;
+}
+
+Pengguna harus login terlebih dahulu. Jika belum, langsung diarahkan ke login.php.
+
+
+
+---
+
+b. Proses Perhitungan & Validasi Backend
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    ...
+    if ($discount_percent > 100) {
+        die("<script> Swal.fire(...) </script>");
+    }
+    ...
+}
+
+Jika diskon lebih dari 100%, tampilkan alert error dan batalkan eksekusi skrip.
+
+Jika valid, hitung diskon dan simpan hasil ke tabel transactions.
+
+
+
+---
+
+c. Simpan Data ke Database
+
+$query = "INSERT INTO transactions (item_name, original_price, discount_percent, final_price)
+          VALUES ('$item_name', '$original_price', '$discount_percent', '$final_price')";
+$conn->query($query);
+
+Data hasil perhitungan dimasukkan ke database menggunakan INSERT INTO.
+
+
+
+---
+
+d. Tampilan Form HTML
+
+<form method="POST" id="discountForm">
+    <input type="text" name="item_name" ...>
+    <input type="text" id="original_price" ...>
+    <input type="number" id="discount_percent" ...>
+</form>
+
+Input nama barang, harga awal (diformat ribuan), dan persentase diskon.
+
+Tombol submit dengan label "Hitung".
+
+
+
+---
+
+e. Hasil Perhitungan (Jika Ada)
+
+<?php if ($final_price !== null): ?>
+    <div class="alert alert-info">
+        ...
+    </div>
+    <script>Swal.fire({icon: 'success', ...})</script>
+<?php endif; ?>
+
+Jika perhitungan sukses, tampilkan hasil dan munculkan notifikasi berhasil menggunakan SweetAlert2.
+
+
+
+---
+
+f. Validasi Frontend & Format Ribuan
+
+document.getElementById('original_price').addEventListener('input', function (e) {
+    ...
+});
+
+document.getElementById('discountForm').addEventListener('submit', function (e) {
+    ...
+});
+
+Input harga akan otomatis diformat jadi ribuan (misal: 1000000 jadi 1.000.000).
+
+Validasi diskon: jika lebih dari 100%, tampilkan pesan error dan batalkan pengiriman form.
+
+
+
+---
+
+g. Styling CSS
+
+body {
+    background: linear-gradient(to bottom, #ffffff, #87CEEB);
+    ...
+}
+.container-box {
+    background: white;
+    ...
+}
+
+Background putih ke biru langit untuk kesan profesional dan ringan.
+
+Container utama dengan shadow & radius halus untuk tampil elegan.
+
+
+
+---
+
+4. Struktur Tabel transactions (Contoh)
+
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_name VARCHAR(100),
+    original_price BIGINT,
+    discount_percent INT,
+    final_price BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+---
+
+5. Alur Kerja (Flow)
+
+[Login Diperiksa]
+   |
+   v
+[Input Nama Barang, Harga, Diskon]
+   |
+   v
+[Validasi: Apakah Diskon > 100%?]
+   |                         \
+   | Ya                      Tidak
+   |                         |
+   v                         v
+[Tampilkan Error]     [Hitung Diskon & Simpan ke DB]
+   |                         |
+   |                         v
+   +------------------> [Tampilkan Hasil + SweetAlert]
+
+
+---
+
+6. Fitur Tambahan yang Bisa Dikembangkan
+
+Menambahkan histori transaksi.
+
+Menampilkan grafik ringkasan diskon bulanan.
+
+Export hasil ke PDF.
+
+Validasi tambahan (misal harga tidak boleh kosong/nol).
+
+Autocomplete barang dari database.
+
+
+
+---
