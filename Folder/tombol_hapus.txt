@@ -1,0 +1,26 @@
+Menambah Tombol Hapus di setiap Baris
+<td class="text-center">
+    <a href="hapus.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
+        <i class="fas fa-trash"></i> Hapus
+    </a>
+</td>
+
+
+
+
+file Hapus.php
+<?php
+include 'koneksi.php';
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $query = "DELETE FROM transactions WHERE id = '$id'";
+    if ($conn->query($query)) {
+        header("Location: riwayat.php"); // ganti dengan nama file utama jika beda
+        exit;
+    } else {
+        echo "Gagal menghapus data.";
+    }
+} else {
+    echo "ID tidak ditemukan.";
+}
+?>
